@@ -8,10 +8,11 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/disgoorg/disgo-butler/butler"
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/webhook"
 	"github.com/google/go-github/v44/github"
+
+	"github.com/disgoorg/disgo-butler/butler"
 )
 
 var (
@@ -96,19 +97,14 @@ func processReleaseEvent(b *butler.Butler, e *github.ReleaseEvent) error {
 	message += "\n\n__**Commits:**__\n"
 out:
 	for _, commit := range comparison.Commits {
-		commitLines := strings.Split(commit.GetCommit().GetMessage(), "\n")
-		for i, commitLine := range commitLines {
-			shortId := "......."
-			if i == 0 {
-				shortId = substr(commit.GetSHA(), 0, 7)
-			}
-			line := fmt.Sprintf("[`%s`](%s) %s\n", shortId, commit.GetHTMLURL(), commitLine)
-			if len(message)+len(line) > 4068 {
-				message += "…"
-				break out
-			}
-			message += line
+		commitLine := strings.SplitN(commit.GetCommit().GetMessage(), "\n", 2)[0]
+		shortId := substr(commit.GetSHA(), 0, 7)
+		line := fmt.Sprintf("[`%s`](%s) %s\n", shortId, commit.GetHTMLURL(), commitLine)
+		if len(message)+len(line) > 4068 {
+			message += "…"
+			break out
 		}
+		message += line
 	}
 
 	msg, err := webhookClient.CreateMessage(discord.NewWebhookMessageCreateBuilder().
