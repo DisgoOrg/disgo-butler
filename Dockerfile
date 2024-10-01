@@ -10,7 +10,7 @@ COPY . .
 
 ARG VERSION=dev
 
-RUN CGO_ENABLED=0 go build -ldflags="-X 'main.version=${VERSION}'-w -s" -o bot main.go
+RUN CGO_ENABLED=0 go build -ldflags="-X 'main.version=${VERSION}'-w -s" -o bot github.com/disgoorg/disgo-butler
 
 FROM alpine
 
