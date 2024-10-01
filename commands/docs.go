@@ -2,17 +2,19 @@ package commands
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
 	"time"
 
-	"github.com/disgoorg/disgo-butler/butler"
-	"github.com/disgoorg/disgo-butler/common"
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
 	"github.com/hhhapz/doc"
 	"github.com/lithammer/fuzzysearch/fuzzy"
+
+	"github.com/disgoorg/disgo-butler/butler"
+	"github.com/disgoorg/disgo-butler/common"
 )
 
 var docsCommand = discord.SlashCommandCreate{
@@ -64,7 +66,7 @@ func HandleDocsAutocomplete(b *butler.Butler) handler.AutocompleteHandler {
 		if option, ok := e.Data.Option("query"); ok && option.Focused {
 			return handleQueryAutocomplete(b, e, e.Data.String("module"), e.Data.String("query"))
 		}
-		return e.Result(nil)
+		return e.AutocompleteResult(nil)
 	}
 }
 
@@ -99,19 +101,19 @@ func handleModuleAutocomplete(b *butler.Butler, e *handler.AutocompleteEvent, mo
 			}
 		})
 	}
-	return e.Result(replaceAliases(b, choices))
+	return e.AutocompleteResult(replaceAliases(b, choices))
 }
 
 func handleQueryAutocomplete(b *butler.Butler, e *handler.AutocompleteEvent, module string, query string) error {
 	ex, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	pkg, err := b.DocClient.Search(ex, module)
-	if err == doc.InvalidStatusError(404) {
-		return e.Result([]discord.AutocompleteChoice{
+	if errors.Is(err, doc.InvalidStatusError(404)) {
+		return e.AutocompleteResult([]discord.AutocompleteChoice{
 			discord.AutocompleteChoiceString{Name: "module not found", Value: ""},
 		})
 	} else if err != nil {
-		return e.Result(nil)
+		return e.AutocompleteResult(nil)
 	}
 	choices := make([]discord.AutocompleteChoiceString, 0, 25)
 	if query == "" {
@@ -136,7 +138,7 @@ func handleQueryAutocomplete(b *butler.Butler, e *handler.AutocompleteEvent, mod
 		}
 		choices = append(choices, discord.AutocompleteChoiceString{Name: rank.Target, Value: rank.Target})
 	}
-	return e.Result(replaceAliases(b, choices))
+	return e.AutocompleteResult(replaceAliases(b, choices))
 }
 
 func replaceAliases(b *butler.Butler, choices []discord.AutocompleteChoiceString) []discord.AutocompleteChoice {

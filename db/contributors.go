@@ -34,11 +34,11 @@ func (s *sqlDB) AddContributor(username string, session oauth2.Session) (err err
 	_, err = s.db.NewInsert().
 		Model(&Contributor{
 			Username:     username,
-			AccessToken:  session.AccessToken(),
-			RefreshToken: session.RefreshToken(),
-			Scopes:       session.Scopes(),
-			TokenType:    session.TokenType(),
-			Expiration:   session.Expiration(),
+			AccessToken:  session.AccessToken,
+			RefreshToken: session.RefreshToken,
+			Scopes:       session.Scopes,
+			TokenType:    session.TokenType,
+			Expiration:   session.Expiration,
 		}).
 		Exec(context.TODO())
 	return

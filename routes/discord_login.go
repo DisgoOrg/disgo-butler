@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/disgo/oauth2"
 	"github.com/disgoorg/json"
 	"github.com/google/go-github/v44/github"
 
@@ -18,7 +19,10 @@ var templateFS embed.FS
 
 func HandleLogin(b *butler.Butler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, b.OAuth2.GenerateAuthorizationURL(b.Config.BaseURL+"/github", discord.PermissionsNone, 0, false, discord.OAuth2ScopeGuildsMembersRead, discord.OAuth2ScopeConnections, discord.OAuth2ScopeRoleConnectionsWrite), http.StatusTemporaryRedirect)
+		http.Redirect(w, r, b.OAuth2.GenerateAuthorizationURL(oauth2.AuthorizationURLParams{
+			RedirectURI: b.Config.BaseURL + "/github",
+			Scopes:      []discord.OAuth2Scope{discord.OAuth2ScopeGuildsMembersRead, discord.OAuth2ScopeConnections, discord.OAuth2ScopeRoleConnectionsWrite},
+		}), http.StatusTemporaryRedirect)
 	}
 }
 
@@ -35,7 +39,7 @@ func HandleGithub(b *butler.Butler) http.HandlerFunc {
 			return
 		}
 
-		session, err := b.OAuth2.StartSession(code, state, state)
+		session, _, err := b.OAuth2.StartSession(code, state)
 		if err != nil {
 			httpError(w, err)
 			return

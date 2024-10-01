@@ -2,17 +2,19 @@ package commands
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
 
-	"github.com/disgoorg/disgo-butler/butler"
-	"github.com/disgoorg/disgo-butler/common"
-	"github.com/disgoorg/disgo-butler/db"
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
 	"github.com/disgoorg/paginator"
 	"github.com/lithammer/fuzzysearch/fuzzy"
+
+	"github.com/disgoorg/disgo-butler/butler"
+	"github.com/disgoorg/disgo-butler/common"
+	"github.com/disgoorg/disgo-butler/db"
 )
 
 var tagsCommand = discord.SlashCommandCreate{
@@ -107,12 +109,12 @@ func HandleEditTag(b *butler.Butler) handler.CommandHandler {
 		name := formatTagName(data.String("name"))
 
 		tag, err := b.DB.Get(*e.GuildID(), name)
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return common.RespondErrMessage(e.Respond, "Tag not found.")
 		} else if err != nil {
 			return common.RespondMessageErr(e.Respond, "Failed to edit tag: %s", err)
 		}
-		if e.User().ID != tag.OwnerID && e.Member().Permissions.Missing(discord.PermissionManageServer) {
+		if e.User().ID != tag.OwnerID && e.Member().Permissions.Missing(discord.PermissionManageGuild) {
 			return common.RespondErrMessage(e.Respond, "You do not have permission to edit this tag.")
 		}
 
@@ -129,12 +131,12 @@ func HandleDeleteTag(b *butler.Butler) handler.CommandHandler {
 		name := formatTagName(data.String("name"))
 
 		tag, err := b.DB.Get(*e.GuildID(), name)
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return common.RespondErrMessage(e.Respond, "Tag not found.")
 		} else if err != nil {
 			return common.RespondMessageErr(e.Respond, "Failed to delete tag: %s", err)
 		}
-		if e.User().ID != tag.OwnerID && e.Member().Permissions.Missing(discord.PermissionManageServer) {
+		if e.User().ID != tag.OwnerID && e.Member().Permissions.Missing(discord.PermissionManageGuild) {
 			return common.RespondErrMessage(e.Respond, "You do not have permission to delete this tag.")
 		}
 
@@ -150,7 +152,7 @@ func HandleTagInfo(b *butler.Butler) handler.CommandHandler {
 		data := e.SlashCommandInteractionData()
 		name := formatTagName(data.String("name"))
 		tag, err := b.DB.Get(*e.GuildID(), name)
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return common.Respondf(e.Respond, "Tag `%s` does not exist.", name)
 		} else if err != nil {
 			return common.RespondMessageErr(e.Respond, "Failed to get tag info: ", err)
@@ -223,14 +225,14 @@ func HandleTagListAutoComplete(b *butler.Butler, filterTags bool) handler.Autoco
 			tags []db.Tag
 			err  error
 		)
-		if filterTags && e.Member().Permissions.Missing(discord.PermissionManageServer) {
+		if filterTags && e.Member().Permissions.Missing(discord.PermissionManageGuild) {
 			tags, err = b.DB.GetAllUser(*e.GuildID(), e.User().ID)
 		} else {
 			tags, err = b.DB.GetAll(*e.GuildID())
 		}
 
 		if err != nil {
-			return e.Result(nil)
+			return e.AutocompleteResult(nil)
 		}
 		var response []discord.AutocompleteChoice
 
@@ -248,7 +250,7 @@ func HandleTagListAutoComplete(b *butler.Butler, filterTags bool) handler.Autoco
 				Value: option,
 			})
 		}
-		return e.Result(response)
+		return e.AutocompleteResult(response)
 	}
 }
 

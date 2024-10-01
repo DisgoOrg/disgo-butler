@@ -82,7 +82,7 @@ func GetDocsEmbed(pkg doc.Package, query string, expandSignature bool, expandCom
 
 	options = append(options, discord.NewStringSelectMenuOption("delete", "delete").WithEmoji(discord.ComponentEmoji{Name: "❌"}))
 
-	return embed, discord.NewStringSelectMenu("docs_action", "action", options...)
+	return embed, discord.NewStringSelectMenu("/docs_action", "action", options...)
 }
 
 func EmbedFromPackage(pkg doc.Package, expandComment bool, expandExamples bool) (discord.Embed, bool, bool) {

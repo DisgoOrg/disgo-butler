@@ -4,8 +4,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/disgoorg/disgo-butler/butler"
-	"github.com/disgoorg/disgo-butler/common"
 	"github.com/disgoorg/disgo/bot"
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
@@ -13,6 +11,9 @@ import (
 	"github.com/disgoorg/json"
 	"github.com/disgoorg/snowflake/v2"
 	gopiston "github.com/milindmadhukar/go-piston"
+
+	"github.com/disgoorg/disgo-butler/butler"
+	"github.com/disgoorg/disgo-butler/common"
 )
 
 var discordCodeblockRegex = regexp.MustCompile(`(?s)\x60\x60\x60(?P<language>\w+)\n(?P<code>.+)\x60\x60\x60`)
@@ -24,11 +25,11 @@ var evalCommand = discord.MessageCommandCreate{
 func HandleEval(b *butler.Butler) handler.CommandHandler {
 	return func(e *handler.CommandEvent) error {
 		message := e.MessageCommandInteractionData().TargetMessage()
-		return Eval(b, e.Client(), e.BaseInteraction, e.Respond, message.Content, message.ID, false)
+		return Eval(b, e.Client(), e.ApplicationCommandInteraction, e.Respond, message.Content, message.ID, false)
 	}
 }
 
-func Eval(b *butler.Butler, client bot.Client, i discord.BaseInteraction, r events.InteractionResponderFunc, content string, messageID snowflake.ID, update bool) error {
+func Eval(b *butler.Butler, client bot.Client, i discord.Interaction, r events.InteractionResponderFunc, content string, messageID snowflake.ID, update bool) error {
 	runtimes, err := b.PistonClient.GetRuntimes()
 	if err != nil {
 		return common.RespondErr(r, err)
@@ -112,10 +113,10 @@ runtimeLoop:
 		Embeds:  &[]discord.Embed{output},
 		Components: &[]discord.ContainerComponent{
 			discord.ActionRowComponent{
-				discord.NewPrimaryButton("", "eval/rerun/"+messageID.String()).WithEmoji(discord.ComponentEmoji{
+				discord.NewPrimaryButton("", "/eval/rerun/"+messageID.String()).WithEmoji(discord.ComponentEmoji{
 					Name: "🔁",
 				}),
-				discord.NewDangerButton("", "eval/delete").WithEmoji(discord.ComponentEmoji{
+				discord.NewDangerButton("", "/eval/delete").WithEmoji(discord.ComponentEmoji{
 					Name: "🗑️",
 				}),
 			},

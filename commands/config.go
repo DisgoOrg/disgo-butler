@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/disgoorg/disgo-butler/butler"
-	"github.com/disgoorg/disgo-butler/common"
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
 	"golang.org/x/exp/slices"
+
+	"github.com/disgoorg/disgo-butler/butler"
+	"github.com/disgoorg/disgo-butler/common"
 )
 
 var configCommand = discord.SlashCommandCreate{

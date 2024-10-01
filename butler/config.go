@@ -5,10 +5,11 @@ import (
 	"errors"
 	"os"
 
-	"github.com/disgoorg/disgo-butler/db"
-	"github.com/disgoorg/disgo-butler/mod_mail"
 	"github.com/disgoorg/log"
 	"github.com/disgoorg/snowflake/v2"
+
+	"github.com/disgoorg/disgo-butler/db"
+	"github.com/disgoorg/disgo-butler/mod_mail"
 )
 
 func LoadConfig() (*Config, error) {

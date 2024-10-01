@@ -4,10 +4,11 @@ import (
 	"context"
 	"strings"
 
-	"github.com/disgoorg/disgo-butler/butler"
-	"github.com/disgoorg/disgo-butler/common"
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
+
+	"github.com/disgoorg/disgo-butler/butler"
+	"github.com/disgoorg/disgo-butler/common"
 )
 
 func HandleDocsAction(b *butler.Butler) handler.ComponentHandler {

@@ -2,10 +2,11 @@ package commands
 
 import (
 	"github.com/disgoorg/disgo"
-	"github.com/disgoorg/disgo-butler/butler"
-	"github.com/disgoorg/disgo-butler/common"
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
+
+	"github.com/disgoorg/disgo-butler/butler"
+	"github.com/disgoorg/disgo-butler/common"
 )
 
 var infoCommand = discord.SlashCommandCreate{

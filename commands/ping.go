@@ -3,10 +3,11 @@ package commands
 import (
 	"time"
 
-	"github.com/disgoorg/disgo-butler/common"
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
 	"github.com/disgoorg/disgo/rest"
+
+	"github.com/disgoorg/disgo-butler/common"
 )
 
 var pingCommand = discord.SlashCommandCreate{

@@ -85,7 +85,6 @@ func (b *Butler) SetupBot(r handler.Router) {
 			httpserver.WithAddress(b.Config.Interactions.Address),
 			httpserver.WithURL(b.Config.Interactions.URL),
 		),
-		bot.WithLogger(b.Logger),
 	); err != nil {
 		b.Logger.Errorf("Failed to start bot: %s", err)
 	}
@@ -218,7 +217,13 @@ func (b *Butler) UpdateContributorRoles() error {
 			continue
 		}
 
-		session := newSession(contributor)
+		session := oauth2.Session{
+			AccessToken:  contributor.AccessToken,
+			RefreshToken: contributor.RefreshToken,
+			Scopes:       contributor.Scopes,
+			TokenType:    contributor.TokenType,
+			Expiration:   contributor.Expiration,
+		}
 		if _, err = b.OAuth2.UpdateApplicationRoleConnection(session, b.Client.ApplicationID(), discord.ApplicationRoleConnectionUpdate{
 			Metadata: &metadata,
 		}); err != nil {

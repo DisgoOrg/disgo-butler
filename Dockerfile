@@ -1,6 +1,4 @@
-FROM golang:1.19-alpine AS build
-
-ARG VERSION=dev
+FROM golang:1.23-alpine AS build
 
 WORKDIR /build
 
@@ -10,7 +8,9 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 go build -ldflags="-X 'main.version=${VERSION}'-w -s" -o bot cmd/main.go
+ARG VERSION=dev
+
+RUN CGO_ENABLED=0 go build -ldflags="-X 'main.version=${VERSION}'-w -s" -o bot main.go
 
 FROM alpine
 

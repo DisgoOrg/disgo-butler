@@ -4,15 +4,15 @@
     <title>Github Connection</title>
 </head>
 <body>
-    <p>
-        Updated contributions for following repositories:
-        <ul>
-            {{ range .Repos }}
-                <li>
-                    <a href="https://github.com/{{ . }}">{{ . }}</a>
-                </li>
-            {{ end }}
-        </ul>
-    </p>
+<p>
+    Updated contributions for following repositories:
+<ul>
+    {{ range .Repos }}
+    <li>
+        <a href="https://github.com/{{ . }}">{{ . }}</a>
+    </li>
+    {{ end }}
+</ul>
+</p>
 </body>
 </html>
