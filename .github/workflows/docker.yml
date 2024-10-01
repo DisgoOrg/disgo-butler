@@ -43,7 +43,6 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./cmd/Dockerfile
           platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
           push: true
           build-args: VERSION=${{ steps.meta.outputs.version }}
